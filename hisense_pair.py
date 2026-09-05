@@ -144,4 +144,4 @@ def pair_tv(ip, cert_file='cert1024.pem', key_file='key1024.pem'):
         print('PAIRING FAILED!')
 
 if __name__ == '__main__':
-    pair_tv('192.168.1.5')
+    pair_tv('192.168.1.4')

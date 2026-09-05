@@ -33,7 +33,7 @@ def build_key_command(action, key_code):
     b[2:4] = struct.pack('>H', len(b) - 4)
     return b
 
-def send_key(key_code, ip='192.168.1.2'):
+def send_key(key_code, ip='192.168.1.4'):
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
@@ -78,45 +78,49 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Send commands to Android TV')
     parser.add_argument('key', type=str, help='The key to send, e.g., VOLUME_UP, HOME, 25')
-    parser.add_argument('--ip', type=str, default='192.168.1.2', help='TV IP address')
+    parser.add_argument('--ip', type=str, default='192.168.1.4', help='TV IP address')
     args = parser.parse_args()
     
-    try:
-        key = int(args.key)
-    except:
-        # ICONE / Standard Android Keycodes
-        keys = {
-            # Power & Input
-            "POWER": 26, "STB": 26, "TV": 177, "SOURCE": 178,
-            
-            # Numbers
-            "0": 7, "1": 8, "2": 9, "3": 10, "4": 11,
-            "5": 12, "6": 13, "7": 14, "8": 15, "9": 16,
-            "IP/SAT": 237, "VOD": 172,
-            
-            # Navigation
-            "INFO": 165, "RECALL": 229, "MENU": 82, "EXIT": 4, "BACK": 4,
-            "UP": 19, "DOWN": 20, "LEFT": 21, "RIGHT": 22, "OK": 23, "ENTER": 66,
-            
-            # Middle buttons
-            "FAVORITE": 274, "EPG": 172, "PLAYLIST": 226,
-            "VOL+": 24, "VOLUME_UP": 24, "VOL-": 25, "VOLUME_DOWN": 25,
-            "MUTE": 164, "CH+": 166, "CH-": 167,
-            
-            # Colored buttons
-            "RED": 183, "GREEN": 184, "YELLOW": 185, "BLUE": 186,
-            
-            # Bottom block
-            "TELETEXT": 233, "SLEEP": 223, "SUBTITLE": 175, "RADIO/TV": 232,
-            "PIP": 171, "RESOLUTION": 230, "CURSOR": 110, "V.FORMAT": 258,
-            
-            # Media Controls
-            "PLAY_PAUSE": 85, "STOP": 86, "RECORD": 130,
-            "REWIND": 89, "FAST_FORWARD": 90, 
-            "PREVIOUS": 88, "NEXT": 87
-        }
-        key = keys.get(args.key.upper(), None)
-        if key is None:
+    # ICONE / Standard Android Keycodes
+    keys_dict = {
+        # Power & Input
+        "POWER": 26, "STB": 26, "TV": 177, "SOURCE": 178,
+        
+        # Numbers
+        "0": 7, "1": 8, "2": 9, "3": 10, "4": 11,
+        "5": 12, "6": 13, "7": 14, "8": 15, "9": 16,
+        "IP/SAT": 237, "VOD": 172,
+        
+        # Navigation
+        "INFO": 165, "RECALL": 229, "MENU": 82, "EXIT": 4, "BACK": 4,
+        "UP": 19, "DOWN": 20, "LEFT": 21, "RIGHT": 22, "OK": 23, "ENTER": 66,
+        
+        # Middle buttons
+        "FAVORITE": 274, "EPG": 172, "PLAYLIST": 226,
+        "VOL+": 24, "VOLUME_UP": 24, "VOL-": 25, "VOLUME_DOWN": 25,
+        "MUTE": 164, "CH+": 166, "CH-": 167,
+        
+        # Colored buttons
+        "RED": 183, "GREEN": 184, "YELLOW": 185, "BLUE": 186,
+        
+        # Bottom block
+        "TELETEXT": 233, "SLEEP": 223, "SUBTITLE": 175, "RADIO/TV": 232,
+        "PIP": 171, "RESOLUTION": 230, "CURSOR": 110, "V.FORMAT": 258,
+        
+        # Media Controls
+        "PLAY_PAUSE": 85, "STOP": 86, "RECORD": 130,
+        "REWIND": 89, "FAST_FORWARD": 90, 
+        "PREVIOUS": 88, "NEXT": 87
+    }
+    
+    # Prioritize checking the dictionary for aliases (including "0"-"9")
+    if args.key.upper() in keys_dict:
+        key = keys_dict[args.key.upper()]
+    else:
+        try:
+            # If not in dictionary, try parsing as raw Android KeyEvent integer
+            key = int(args.key)
+        except ValueError:
             print(f"Unknown key alias: {args.key}. Using fallback 25 (VOL-)")
             key = 25
     
