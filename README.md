@@ -141,13 +141,15 @@ Sent to inject keystrokes. Sent twice per keypress (once for ACTION_DOWN, once f
 ## Prerequisites & Setup
 
 1. **Python 3.x**
-2. **OpenSSL** (required to generate the legacy 1024-bit certificates).
+2. **cryptography module** (`pip install cryptography`)
 
-Generate the required 1024-bit certificates by running:
+Because this TV uses legacy 1024-bit RSA keys, you must generate a matching certificate to bypass modern TLS restrictions. We've included a script to do this automatically:
+
 ```bash
-openssl req -x509 -nodes -days 3650 -newkey rsa:1024 -keyout key1024.pem -out cert1024.pem
+pip install cryptography
+python generate_cert.py
 ```
-*(Keep `key1024.pem` and `cert1024.pem` in the same directory as the scripts).*
+*(This will generate `key1024.pem` and `cert1024.pem` in your directory).*
 
 ## Usage
 
